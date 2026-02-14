@@ -178,9 +178,9 @@ export default function TriageDashboard() {
               © 2026 CureLine: Automated Triage System. All rights reserved.
             </p>
             <div className="flex items-center space-x-6 mt-4 md:mt-0">
-              <p className="text-xs text-muted-foreground">Version 2.1.0</p>
+              <p className="text-xs text-muted-foreground">Version 2.2.0</p>
               <p className="text-xs text-muted-foreground">
-                Last Updated: January 2026
+                Last Updated: February 2026
               </p>
               <p className="text-xs text-muted-foreground">Uptime: 99.9%</p>
             </div>
