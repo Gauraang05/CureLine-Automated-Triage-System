@@ -1,3 +1,4 @@
+import { findNearbyHospitals, Hospital } from "./services/hospital_service";
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
@@ -5,6 +6,25 @@ import { mlService } from "./ml-service";
 import { insertPatientSchema } from "@shared/schema";
 import { z } from "zod";
 
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) {
+  const R = 6371; // km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all patients in queue (sorted by priority)
   app.get("/api/patients/queue", async (_req, res) => {
@@ -17,25 +37,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get queue statistics  
+  // Get queue statistics
   app.get("/api/patients/stats", async (_req, res) => {
     try {
       const stats = await storage.getPatientStats();
       const allPatients = await storage.getAllPatients();
-      
+
       const priorityCounts = {
-        critical: stats.priorityCounts['1'] || 0,
-        urgent: stats.priorityCounts['2'] || 0,
-        semiUrgent: stats.priorityCounts['3'] || 0,
-        standard: stats.priorityCounts['4'] || 0,
-        nonUrgent: stats.priorityCounts['5'] || 0,
+        critical: stats.priorityCounts["1"] || 0,
+        urgent: stats.priorityCounts["2"] || 0,
+        semiUrgent: stats.priorityCounts["3"] || 0,
+        standard: stats.priorityCounts["4"] || 0,
+        nonUrgent: stats.priorityCounts["5"] || 0,
       };
 
       res.json({
         totalInQueue: stats.totalInQueue,
         priorityCounts,
         avgWaitTime: stats.averageWaitTime,
-        totalProcessed: allPatients.length
+        totalProcessed: allPatients.length,
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -70,7 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Validate input data
       const validatedData = insertPatientSchema.parse(req.body);
-      
+
       // Predict triage level using ML service
       const triageLevel = await mlService.predictTriageLevel({
         sex: validatedData.sex,
@@ -86,25 +106,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         rr: validatedData.rr,
         bt: validatedData.bt,
         saturation: validatedData.saturation,
-        diagnosis: validatedData.diagnosis
+        diagnosis: validatedData.diagnosis,
       });
 
       // Create patient record with predicted triage level
       const patient = await storage.createPatient({
         ...validatedData,
-        triageLevel
+        triageLevel,
       });
 
       res.json({
         patient,
         triageLevel,
-        message: "Patient successfully added to triage queue"
+        message: "Patient successfully added to triage queue",
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ 
-          error: "Invalid patient data", 
-          details: error.errors 
+        res.status(400).json({
+          error: "Invalid patient data",
+          details: error.errors,
         });
       } else {
         console.error("Error creating patient:", error);
@@ -118,13 +138,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { status } = req.body;
-      
+
       if (!["waiting", "in_treatment", "completed"].includes(status)) {
         return res.status(400).json({ error: "Invalid status value" });
       }
 
       const updatedPatient = await storage.updatePatientStatus(id, status);
-      
+
       if (!updatedPatient) {
         return res.status(404).json({ error: "Patient not found" });
       }
@@ -141,17 +161,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { doctorId, status } = req.body;
-      
+
       if (!doctorId) {
         return res.status(400).json({ error: "Doctor ID is required" });
       }
-      
+
       if (!["waiting", "in_treatment", "completed"].includes(status)) {
         return res.status(400).json({ error: "Invalid status value" });
       }
 
-      const updatedPatient = await storage.assignPatientToDoctor(id, doctorId, status);
-      
+      const updatedPatient = await storage.assignPatientToDoctor(
+        id,
+        doctorId,
+        status,
+      );
+
       if (!updatedPatient) {
         return res.status(404).json({ error: "Patient not found" });
       }
@@ -167,9 +191,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/patients/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      
+
       const removed = await storage.removePatient(id);
-      
+
       if (!removed) {
         return res.status(404).json({ error: "Patient not found" });
       }
@@ -186,17 +210,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { newPriority, doctorId } = req.body;
-      
+
       if (!newPriority || !doctorId) {
-        return res.status(400).json({ error: "New priority and doctor ID are required" });
-      }
-      
-      if (newPriority < 1 || newPriority > 5) {
-        return res.status(400).json({ error: "Priority must be between 1 and 5" });
+        return res
+          .status(400)
+          .json({ error: "New priority and doctor ID are required" });
       }
 
-      const updatedPatient = await storage.overridePatientPriority(id, newPriority, doctorId);
-      
+      if (newPriority < 1 || newPriority > 5) {
+        return res
+          .status(400)
+          .json({ error: "Priority must be between 1 and 5" });
+      }
+
+      const updatedPatient = await storage.overridePatientPriority(
+        id,
+        newPriority,
+        doctorId,
+      );
+
       if (!updatedPatient) {
         return res.status(404).json({ error: "Patient not found" });
       }
@@ -208,6 +240,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/hospitals/search", async (req, res) => {
+    try {
+      const { latitude, longitude, radius } = req.body;
+
+      if (!latitude || !longitude) {
+        return res.status(400).json({ message: "Location required" });
+      }
+
+      const hospitals = await findNearbyHospitals(
+        latitude,
+        longitude,
+        radius || 50000,
+      );
+
+      if (!hospitals.length) {
+        return res.json({
+          recommended: null,
+          hospitals: [],
+        });
+      }
+
+      const ranked = hospitals
+        .map((hospital: Hospital) => ({
+          ...hospital,
+          distance: calculateDistance(
+            latitude,
+            longitude,
+            hospital.latitude,
+            hospital.longitude,
+          ),
+        }))
+        .sort((a, b) => a.distance - b.distance);
+
+      res.json({
+        recommended: ranked[0],
+        hospitals: ranked.slice(0, 30),
+      });
+    } catch (error) {
+      console.error("Hospital route error:", error);
+      res.status(500).json({ message: "Failed to fetch hospitals" });
+    }
+  });
   const httpServer = createServer(app);
   return httpServer;
 }

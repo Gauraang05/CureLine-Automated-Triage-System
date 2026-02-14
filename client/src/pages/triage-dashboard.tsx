@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import PatientIntakeForm from "@/components/patient-intake-form";
 import TriageQueue from "@/components/triage-queue";
 import StatsPanel from "@/components/stats-panel";
+import HospitalFinder from "@/components/hospitalFinder";
 
 export default function TriageDashboard() {
   const [currentTime, setCurrentTime] = useState("");
@@ -78,6 +79,10 @@ export default function TriageDashboard() {
         {/* Patient Intake Form - Wider container */}
         <div className="mt-8 max-w-4xl mx-auto">
           <PatientIntakeForm onPatientAdded={() => refetchQueue()} />
+        </div>
+
+        <div className="mt-8 max-w-4xl mx-auto">
+          <HospitalFinder />
         </div>
 
         {/* Triage Queue - Full width at bottom */}
