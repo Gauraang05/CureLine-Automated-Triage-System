@@ -24,7 +24,8 @@ In emergency environments, manual triage can be time-consuming and prone to dela
 - Automated patient severity scoring
 - Dynamic priority-based triage queue
 - Add, update and manage patient queue
-- RESTful API architecture
+- Doctor's Assignment
+- Hospital Finder 
 - Real-time UI updates
 - Responsive and modern interface
 
