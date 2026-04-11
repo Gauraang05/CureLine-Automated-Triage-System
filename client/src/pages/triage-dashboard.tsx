@@ -86,11 +86,11 @@ export default function TriageDashboard() {
         <StatsPanel stats={statsData} />
 
         {/* Patient Intake Form - Wider container */}
-        <div className="mt-8 max-w-4xl mx-auto">
+        <div className="mt-8 w-full max-w-4xl mx-auto">
           <PatientIntakeForm onPatientAdded={() => refetchQueue()} />
         </div>
 
-        <div className="mt-8 max-w-4xl mx-auto">
+        <div className="mt-8 w-full max-w-4xl mx-auto">
           <HospitalFinder />
         </div>
 
