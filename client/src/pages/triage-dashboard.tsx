@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+<<<<<<< HEAD
 import { Heart, Users, Stethoscope, LayoutDashboard } from "lucide-react";
+=======
+import { Heart, Users, Stethoscope } from "lucide-react";
+>>>>>>> 412b2d8d7b56ced271f5bbb846876283208747d2
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import PatientIntakeForm from "@/components/patient-intake-form";
@@ -53,6 +57,7 @@ export default function TriageDashboard() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+<<<<<<< HEAD
               <Link href="/dashboard">
                 <Button
                   variant="outline"
@@ -62,6 +67,8 @@ export default function TriageDashboard() {
                   Admin Dashboard
                 </Button>
               </Link>
+=======
+>>>>>>> 412b2d8d7b56ced271f5bbb846876283208747d2
               <Link href="/doctors">
                 <Button
                   variant="outline"

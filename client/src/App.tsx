@@ -5,14 +5,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import TriageDashboard from "@/pages/triage-dashboard";
-import DoctorAssignment from "@/pages/doctor-assignment";
+import DoctorAssignment from "@/pages/doctor-assignment"
 import AdminDashboard from "@/pages/admin-dashboard";
+
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={TriageDashboard} />
       <Route path="/doctors" component={DoctorAssignment} />
+
       <Route path="/dashboard" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
