@@ -4,9 +4,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 const mockAlerts = [
-  { id: 1, type: "critical", message: "Critical patient arrived: Cardiac Arrest", time: "Just now" },
-  { id: 2, type: "warning", message: "Aanchal Mahadevan (Cardiologist) is currently busy", time: "5 mins ago" },
-  { id: 3, type: "info", message: "Average wait time increased to 22 mins", time: "15 mins ago" },
+  {
+    id: 1,
+    type: "critical",
+    message: "Critical patient arrived: Cardiac Arrest",
+    time: "Just now",
+  },
+  {
+    id: 2,
+    type: "warning",
+    message: "Aanchal Mahadevan (Cardiologist) is currently busy",
+    time: "5 mins ago",
+  },
+  {
+    id: 3,
+    type: "info",
+    message: "Average wait time increased to 18 mins",
+    time: "15 mins ago",
+  },
 ];
 
 export function AlertPanel() {
@@ -31,12 +46,20 @@ export function AlertPanel() {
                 className={`p-4 flex gap-3 items-start ${alert.type === "critical" ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
               >
                 <div className="mt-0.5">
-                  {alert.type === "critical" && <AlertCircle className="h-4 w-4 text-red-500" />}
-                  {alert.type === "warning" && <Clock className="h-4 w-4 text-amber-500" />}
-                  {alert.type === "info" && <Info className="h-4 w-4 text-blue-500" />}
+                  {alert.type === "critical" && (
+                    <AlertCircle className="h-4 w-4 text-red-500" />
+                  )}
+                  {alert.type === "warning" && (
+                    <Clock className="h-4 w-4 text-amber-500" />
+                  )}
+                  {alert.type === "info" && (
+                    <Info className="h-4 w-4 text-blue-500" />
+                  )}
                 </div>
                 <div className="flex-1 space-y-1">
-                  <p className={`text-sm font-medium ${alert.type === "critical" ? "text-red-700 dark:text-red-400" : ""}`}>
+                  <p
+                    className={`text-sm font-medium ${alert.type === "critical" ? "text-red-700 dark:text-red-400" : ""}`}
+                  >
                     {alert.message}
                   </p>
                   <p className="text-xs text-muted-foreground">{alert.time}</p>

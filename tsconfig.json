@@ -2,10 +2,7 @@
   "include": ["client/src/**/*", "shared/**/*", "server/**/*"],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
-<<<<<<< HEAD
-=======
-    // "ignoreDeprecations": "6.0",
->>>>>>> 412b2d8d7b56ced271f5bbb846876283208747d2
+    "ignoreDeprecations": "6.0",
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
     "noEmit": true,
