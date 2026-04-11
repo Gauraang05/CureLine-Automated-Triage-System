@@ -2,8 +2,24 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Users, X, Edit3, Clock } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -15,42 +31,44 @@ interface TriageQueueProps {
 }
 
 const priorityConfig = {
-  1: { 
-    label: 'CRITICAL', 
-    color: 'bg-destructive text-destructive-foreground',
-    borderColor: 'priority-1',
-    pulseClass: 'animate-pulse'
+  1: {
+    label: "CRITICAL",
+    color: "bg-destructive text-destructive-foreground",
+    borderColor: "priority-1",
+    pulseClass: "animate-pulse",
   },
-  2: { 
-    label: 'URGENT', 
-    color: 'bg-orange-500 text-white',
-    borderColor: 'priority-2',
-    pulseClass: ''
+  2: {
+    label: "URGENT",
+    color: "bg-orange-500 text-white",
+    borderColor: "priority-2",
+    pulseClass: "",
   },
-  3: { 
-    label: 'SEMI-URGENT', 
-    color: 'bg-yellow-500 text-white',
-    borderColor: 'priority-3',
-    pulseClass: ''
+  3: {
+    label: "SEMI-URGENT",
+    color: "bg-yellow-500 text-white",
+    borderColor: "priority-3",
+    pulseClass: "",
   },
-  4: { 
-    label: 'STANDARD', 
-    color: 'bg-secondary text-secondary-foreground',
-    borderColor: 'priority-4',
-    pulseClass: ''
+  4: {
+    label: "STANDARD",
+    color: "bg-secondary text-secondary-foreground",
+    borderColor: "priority-4",
+    pulseClass: "",
   },
-  5: { 
-    label: 'NON-URGENT', 
-    color: 'bg-muted-foreground text-white',
-    borderColor: 'priority-5',
-    pulseClass: ''
+  5: {
+    label: "NON-URGENT",
+    color: "bg-muted-foreground text-white",
+    borderColor: "priority-5",
+    pulseClass: "",
   },
 };
 
 export default function TriageQueue({ patients }: TriageQueueProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [editingPriority, setEditingPriority] = useState<{[patientId: string]: number}>({});
+  const [editingPriority, setEditingPriority] = useState<{
+    [patientId: string]: number;
+  }>({});
 
   // Remove patient mutation
   const removePatientMutation = useMutation({
@@ -77,11 +95,21 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
 
   // Override priority mutation
   const overridePriorityMutation = useMutation({
-    mutationFn: async ({ patientId, newPriority }: { patientId: string; newPriority: number }) => {
-      const response = await apiRequest("PATCH", `/api/patients/${patientId}/priority`, {
-        newPriority,
-        doctorId: "emergency-override" // Placeholder doctor ID for emergency overrides
-      });
+    mutationFn: async ({
+      patientId,
+      newPriority,
+    }: {
+      patientId: string;
+      newPriority: number;
+    }) => {
+      const response = await apiRequest(
+        "PATCH",
+        `/api/patients/${patientId}/priority`,
+        {
+          newPriority,
+          doctorId: "emergency-override", // Placeholder doctor ID for emergency overrides
+        },
+      );
       return response.json();
     },
     onSuccess: () => {
@@ -107,9 +135,9 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
   };
 
   const handlePriorityChange = (patientId: string, newPriority: string) => {
-    setEditingPriority(prev => ({
+    setEditingPriority((prev) => ({
       ...prev,
-      [patientId]: parseInt(newPriority)
+      [patientId]: parseInt(newPriority),
     }));
   };
 
@@ -121,7 +149,9 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
   };
 
   const getTimeAgo = (timestamp: Date) => {
-    const minutes = Math.floor((Date.now() - new Date(timestamp).getTime()) / (1000 * 60));
+    const minutes = Math.floor(
+      (Date.now() - new Date(timestamp).getTime()) / (1000 * 60),
+    );
     return `${minutes} min ago`;
   };
 
@@ -130,7 +160,10 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
   };
 
   const isOverridden = (patient: Patient) => {
-    return patient.overriddenTriageLevel !== null && patient.overriddenTriageLevel !== undefined;
+    return (
+      patient.overriddenTriageLevel !== null &&
+      patient.overriddenTriageLevel !== undefined
+    );
   };
 
   return (
@@ -139,11 +172,16 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-2xl font-bold">Triage Queue</CardTitle>
-            <p className="text-muted-foreground mt-1">Real-time priority-based patient queue with management controls</p>
+            <p className="text-muted-foreground mt-1">
+              Real-Time Priority Queue
+            </p>
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground">Patients Waiting</p>
-            <p className="text-2xl font-bold text-primary" data-testid="text-queue-count">
+            <p
+              className="text-2xl font-bold text-primary"
+              data-testid="text-queue-count"
+            >
               {patients.length}
             </p>
           </div>
@@ -181,8 +219,14 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
           <div className="text-right">
             <h4 className="text-sm font-semibold mb-3">Queue Controls</h4>
             <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-              <span className="flex items-center"><Edit3 className="w-3 h-3 mr-1" />Override Priority</span>
-              <span className="flex items-center"><X className="w-3 h-3 mr-1" />Remove Patient</span>
+              <span className="flex items-center">
+                <Edit3 className="w-3 h-3 mr-1" />
+                Override Priority
+              </span>
+              <span className="flex items-center">
+                <X className="w-3 h-3 mr-1" />
+                Remove Patient
+              </span>
               <span className="text-blue-700">🔵 = Doctor Override</span>
             </div>
           </div>
@@ -194,60 +238,79 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
           <div className="text-center py-12" data-testid="empty-queue-state">
             <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold">No Patients in Queue</h3>
-            <p className="text-muted-foreground">Add patients using the intake form to populate the triage queue.</p>
+            <p className="text-muted-foreground">
+              Add patients using the intake form to populate the triage queue.
+            </p>
           </div>
         ) : (
           <div className="space-y-4" data-testid="patient-queue-list">
             {patients.map((patient) => {
               const currentPriority = getCurrentPriority(patient);
-              const priority = priorityConfig[currentPriority as keyof typeof priorityConfig];
+              const priority =
+                priorityConfig[currentPriority as keyof typeof priorityConfig];
               const isEditingThis = editingPriority[patient.id] !== undefined;
               const isPatientOverridden = isOverridden(patient);
-              
+
               return (
-                <div 
+                <div
                   key={patient.id}
-                  className={`${priority.borderColor} bg-card border border-border rounded-lg p-4 shadow-sm ${priority.pulseClass} ${isPatientOverridden ? 'ring-2 ring-blue-500/30' : ''}`}
+                  className={`${priority.borderColor} bg-card border border-border rounded-lg p-4 shadow-sm ${priority.pulseClass} ${isPatientOverridden ? "ring-2 ring-blue-500/30" : ""}`}
                   data-testid={`patient-card-${patient.id}`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className={`w-8 h-8 ${priority.color} rounded-full flex items-center justify-center font-bold text-sm`}>
+                      <div
+                        className={`w-8 h-8 ${priority.color} rounded-full flex items-center justify-center font-bold text-sm`}
+                      >
                         {currentPriority}
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h4 className="font-semibold text-card-foreground" data-testid={`text-patient-name-${patient.id}`}>
+                          <h4
+                            className="font-semibold text-card-foreground"
+                            data-testid={`text-patient-name-${patient.id}`}
+                          >
                             {patient.name}
                           </h4>
                           {isPatientOverridden && (
-                            <Badge variant="outline" className="text-xs px-1 py-0 bg-blue-50 text-blue-700 border-blue-200">
+                            <Badge
+                              variant="outline"
+                              className="text-xs px-1 py-0 bg-blue-50 text-blue-700 border-blue-200"
+                            >
                               Override by {patient.overriddenBy}
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground" data-testid={`text-patient-symptoms-${patient.id}`}>
+                        <p
+                          className="text-sm text-muted-foreground"
+                          data-testid={`text-patient-symptoms-${patient.id}`}
+                        >
                           {patient.diagnosis}
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
                         <div className="flex items-center space-x-2 mb-1">
-                          <Badge 
+                          <Badge
                             className={priority.color}
                             data-testid={`badge-priority-${patient.id}`}
                           >
                             {priority.label}
                           </Badge>
-                          
+
                           {/* Priority Override Controls */}
                           {isEditingThis ? (
                             <div className="flex items-center space-x-1">
                               <Select
-                                value={editingPriority[patient.id]?.toString() || currentPriority.toString()}
-                                onValueChange={(value) => handlePriorityChange(patient.id, value)}
+                                value={
+                                  editingPriority[patient.id]?.toString() ||
+                                  currentPriority.toString()
+                                }
+                                onValueChange={(value) =>
+                                  handlePriorityChange(patient.id, value)
+                                }
                               >
                                 <SelectTrigger className="w-16 h-6 text-xs">
                                   <SelectValue />
@@ -273,11 +336,13 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
                                 size="sm"
                                 variant="ghost"
                                 className="h-6 px-2 text-xs"
-                                onClick={() => setEditingPriority(prev => {
-                                  const updated = {...prev};
-                                  delete updated[patient.id];
-                                  return updated;
-                                })}
+                                onClick={() =>
+                                  setEditingPriority((prev) => {
+                                    const updated = { ...prev };
+                                    delete updated[patient.id];
+                                    return updated;
+                                  })
+                                }
                               >
                                 Cancel
                               </Button>
@@ -287,16 +352,18 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
                               size="sm"
                               variant="ghost"
                               className="h-6 w-6 p-0"
-                              onClick={() => setEditingPriority(prev => ({
-                                ...prev,
-                                [patient.id]: currentPriority
-                              }))}
+                              onClick={() =>
+                                setEditingPriority((prev) => ({
+                                  ...prev,
+                                  [patient.id]: currentPriority,
+                                }))
+                              }
                               data-testid={`edit-priority-${patient.id}`}
                             >
                               <Edit3 className="w-3 h-3" />
                             </Button>
                           )}
-                          
+
                           {/* Remove Patient Button */}
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -311,15 +378,20 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Remove Patient from Queue</AlertDialogTitle>
+                                <AlertDialogTitle>
+                                  Remove Patient from Queue
+                                </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to remove {patient.name} from the queue? This action cannot be undone.
+                                  Are you sure you want to remove {patient.name}{" "}
+                                  from the queue? This action cannot be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
-                                  onClick={() => handleRemovePatient(patient.id)}
+                                  onClick={() =>
+                                    handleRemovePatient(patient.id)
+                                  }
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >
                                   Remove Patient
@@ -328,20 +400,31 @@ export default function TriageQueue({ patients }: TriageQueueProps) {
                             </AlertDialogContent>
                           </AlertDialog>
                         </div>
-                        
-                        <p className="text-xs text-muted-foreground flex items-center" data-testid={`text-time-ago-${patient.id}`}>
+
+                        <p
+                          className="text-xs text-muted-foreground flex items-center"
+                          data-testid={`text-time-ago-${patient.id}`}
+                        >
                           <Clock className="w-3 h-3 mr-1" />
                           {getTimeAgo(patient.timestamp)}
                         </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="mt-3 grid grid-cols-4 gap-2 text-xs text-muted-foreground">
-                    <span data-testid={`text-age-${patient.id}`}>Age: {patient.age}</span>
-                    <span data-testid={`text-bp-${patient.id}`}>BP: {patient.sbp}/{patient.dbp}</span>
-                    <span data-testid={`text-hr-${patient.id}`}>HR: {patient.hr}</span>
-                    <span data-testid={`text-o2-${patient.id}`}>O₂: {patient.saturation}%</span>
+                    <span data-testid={`text-age-${patient.id}`}>
+                      Age: {patient.age}
+                    </span>
+                    <span data-testid={`text-bp-${patient.id}`}>
+                      BP: {patient.sbp}/{patient.dbp}
+                    </span>
+                    <span data-testid={`text-hr-${patient.id}`}>
+                      HR: {patient.hr}
+                    </span>
+                    <span data-testid={`text-o2-${patient.id}`}>
+                      O₂: {patient.saturation}%
+                    </span>
                   </div>
                 </div>
               );
